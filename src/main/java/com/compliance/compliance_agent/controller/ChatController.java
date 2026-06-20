@@ -1,0 +1,23 @@
+package com.compliance.compliance_agent.controller;
+
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/chat")
+public class ChatController {
+
+    private final ChatClient chatClient;
+
+    public ChatController(ChatClient chatClient) {
+        this.chatClient = chatClient;
+    }
+
+    @GetMapping("/test")
+    public String test() {
+        return chatClient.prompt()
+                .user("用一句话解释什么是代码合规审查")
+                .call()
+                .content();
+    }
+}

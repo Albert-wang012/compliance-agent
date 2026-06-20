@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: compliance-agent
+
+  # ???????
+  ai:
+    dashscope:
+      api-key: ${AI_DASHSCOPE_API_KEY}  # ???????????
+      embedding:
+        enabled: true
+        model: text-embedding-v2
+    vectorstore:
+      elasticsearch:
+        initialize-schema: true
+        index-name: spring_ai_vector_index
+  elasticsearch:
+    uris: http://localhost:9200

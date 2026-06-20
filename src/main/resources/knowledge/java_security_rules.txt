@@ -1,0 +1,36 @@
+# Java代码安全与合规规范
+
+## 规则1：禁止硬编码密钥
+任何代码中不应出现硬编码的API密钥、数据库密码、Token等敏感凭证。
+应使用环境变量、配置中心或密钥管理服务（如阿里云KMS）。
+示例违规代码：
+String apiKey = "sk-abc123def456";
+String dbPassword = "admin123";
+
+## 规则2：敏感信息脱敏
+日志输出中不得包含用户手机号、身份证号、银行卡号等个人敏感信息。
+必须使用脱敏工具类进行处理。
+示例违规代码：
+log.info("用户手机号：" + phone);
+System.out.println("身份证号：" + idCard);
+
+## 规则3：SQL注入防护
+所有数据库查询必须使用参数化查询或ORM框架的预编译语句。
+禁止字符串拼接构造SQL。
+示例违规代码：
+String sql = "SELECT * FROM users WHERE name = '" + userName + "'";
+Statement stmt = conn.createStatement();
+ResultSet rs = stmt.executeQuery("SELECT * FROM users WHERE id = " + userId);
+
+## 规则4：开源许可证合规
+使用第三方依赖前，必须检查其开源许可证类型。
+GPL/AGPL等强传染性许可证的库，不得引入商业闭源项目。
+
+## 规则5：异常处理规范
+不得在catch块中仅打印堆栈而不进行任何处理。
+不得将异常信息直接返回给前端。
+
+## 规则6：权限与访问控制
+所有外部接口必须进行身份认证和权限校验。
+不得在代码中注释掉权限检查代码。
+敏感操作必须有操作日志记录。

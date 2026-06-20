@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI合规审查Agent - Demo</title>
+    <style>
+        body { font-family: -apple-system, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; background: #f0f2f5; }
+        h1 { color: #1890ff; }
+        textarea { width: 100%; height: 200px; margin: 10px 0; padding: 12px; font-family: monospace; border: 1px solid #d9d9d9; border-radius: 4px; box-sizing: border-box; }
+        button { padding: 10px 30px; background: #1890ff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
+        button:hover { background: #40a9ff; }
+        #result { background: white; padding: 20px; margin-top: 20px; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .risk-item { border-left: 4px solid #1890ff; padding: 10px 15px; margin: 10px 0; background: #fafafa; }
+        .risk-critical { border-left-color: #ff4d4f; }
+        .risk-high { border-left-color: #fa8c16; }
+        .score { font-size: 24px; font-weight: bold; }
+        .score-danger { color: #ff4d4f; }
+        .score-ok { color: #52c41a; }
+    </style>
+</head>
+<body>
+<h1>🔍 AI 代码合规审查 Agent</h1>
+<p>粘贴代码变更内容，Agent 将自动检测硬编码密钥、SQL注入、敏感信息泄露等合规风险。</p>
+<textarea id="codeDiff" placeholder="在此粘贴代码变更内容...&#10;&#10;例如：&#10;+ String apiKey = &quot;sk-abc123&quot;;&#10;+ log.info(&quot;手机号：&quot; + phone);"></textarea>
+<button onclick="scan()">提交审查</button>
+<div id="result"></div>
+
+<script>
+    async function scan() {
+        const codeDiff = document.getElementById('codeDiff').value;
+        if (!codeDiff.trim()) { alert('请先粘贴代码变更内容'); return; }
+
+        const resultDiv = document.getElementById('result');
+        resultDiv.innerHTML = '⏳ 正在分析中...';
+
+        try {
+            const response = await fetch('/api/compliance/scan', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    codeDiff: codeDiff,
+                    filePath: 'demo.java',
+                    projectType: '金融'
+                })
+            });
+            const data = await response.json();
+
+            const scoreClass = data.score >= 80 ? 'score-ok' : 'score-danger';
+            resultDiv.innerHTML = `
+                <h3>审查结果
+                    <span class="score ${scoreClass}">${data.score}/100</span>
+                    ${data.highRisk ? ' ⚠️ 高风险' : ' ✅ 低风险'}
+                </h3>
+                ${data.risks.length === 0 ? '<p>✅ 未发现合规风险</p>' : ''}
+                ${data.risks.map(r => `
+                    <div class="risk-item risk-${r.level.toLowerCase()}">
+                        ${r.icon} <strong>[${r.level}] ${r.title}</strong> - ${r.location}
+                        <p>📝 ${r.description}</p>
+                        <p>💡 <strong>修复建议：</strong>${r.suggestion}</p>
+                    </div>
+                `).join('')}
+                <hr>
+                <details>
+                    <summary>查看原始分析结果</summary>
+                    <pre style="white-space: pre-wrap; font-size: 12px;">${data.rawAnalysis}</pre>
+                </details>
+            `;
+        } catch(e) {
+            resultDiv.innerHTML = '❌ 分析失败：' + e.message;
+        }
+    }
+</script>
+</body>
+</html>
