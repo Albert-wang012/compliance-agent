@@ -2,6 +2,7 @@ package com.compliance.compliance_agent.service;
 
 import com.compliance.compliance_agent.agent.ComplianceReport;
 import com.compliance.compliance_agent.agent.ComplianceScanner;
+import com.compliance.compliance_agent.integration.WeChatNotifier;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -9,15 +10,25 @@ public class WebhookService {
 
     private final ComplianceScanner scanner;
 
-    public WebhookService(ComplianceScanner scanner) {
+    private final WeChatNotifier weChatNotifier;
+
+    public WebhookService(ComplianceScanner scanner, WeChatNotifier weChatNotifier) {
         this.scanner = scanner;
+        this.weChatNotifier = weChatNotifier;
     }
 
     /**
      * 执行代码审查
      */
     public ComplianceReport review(String codeDiff, String filePath, String projectType) {
-        return scanner.scan(codeDiff, filePath, projectType);
+        ComplianceReport report = scanner.scan(codeDiff, filePath, projectType);
+
+        // 审查完成后，如果有高风险，发送企业微信告警
+        if (report.isHighRisk()) {
+            weChatNotifier.sendComplianceAlert(projectType, filePath, report.getScore(), true);
+        }
+
+        return report;
     }
 
     /**

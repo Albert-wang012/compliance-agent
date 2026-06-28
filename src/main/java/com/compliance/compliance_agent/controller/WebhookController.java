@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
+/**
+ * Webhook Controller
+ */
 @RestController
 @RequestMapping("/api/webhook")
 public class WebhookController {

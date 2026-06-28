@@ -5,6 +5,9 @@ import org.springframework.web.client.RestClient;
 
 import java.util.Map;
 
+/**
+ * GitHub API 客户端
+ */
 @Component
 public class GitHubApiClient {
 

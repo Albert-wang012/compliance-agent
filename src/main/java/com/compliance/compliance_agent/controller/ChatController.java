@@ -13,6 +13,10 @@ public class ChatController {
         this.chatClient = chatClient;
     }
 
+    /**
+     * AI 对话测试
+     * @return
+     */
     @GetMapping("/test")
     public String test() {
         return chatClient.prompt()

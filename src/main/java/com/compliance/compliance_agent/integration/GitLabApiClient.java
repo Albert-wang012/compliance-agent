@@ -5,6 +5,10 @@ import org.springframework.web.client.RestClient;
 
 import java.util.Map;
 
+
+/**
+ * GitLab API 客户端
+ */
 @Component
 public class GitLabApiClient {
 
