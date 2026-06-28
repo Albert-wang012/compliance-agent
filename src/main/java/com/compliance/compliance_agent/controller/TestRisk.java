@@ -14,7 +14,6 @@ public class TestRisk {
         // 风险2：日志输出未脱敏的手机号
         String phone = "13812345678";
         log.info("用户手机号：" + phone);
-        log.info("用户手机号222：" + phone);
 
         System.out.println("API Key: " + apiKey);
     }
