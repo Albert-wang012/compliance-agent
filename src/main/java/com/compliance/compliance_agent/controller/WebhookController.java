@@ -64,7 +64,7 @@ public class WebhookController {
 
     @PostMapping("/github")
     public Map<String, Object> handleGitHubPR(@RequestBody Map<String, Object> payload) {
-        log.info("=== 收到 GitHub Webhook 请求 ===");
+        log.info("收到 Webhook 请求，当前时间: {}", System.currentTimeMillis());
         log.info("事件类型: {}", payload.get("action"));
 
         // 从根节点提取 pull_request（兼容 opened 和 synchronize）
@@ -93,7 +93,7 @@ public class WebhookController {
         // 构建评论并发表
         String comment = webhookService.buildReviewComment(report, "GitHub");
         gitHubApiClient.postComment(owner, repo, prNumber, comment);
-
+        log.info("审查完成，发表评论，当前时间: {}", System.currentTimeMillis());
         return Map.of("success", true, "score", report.getScore(), "platform", "github");
     }
 
